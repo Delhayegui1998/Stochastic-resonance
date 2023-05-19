@@ -1,0 +1,34 @@
+import numpy as np
+import matplotlib.pyplot as plt
+x=np.linspace(-2,2,101)
+N=40000
+t=np.linspace(0,N/10,N)
+k=0.1
+f=np.zeros(101)
+g=np.zeros(101)
+X=np.zeros(101)
+X[0]=2
+F=np.zeros(N)
+C=np.zeros(N)
+F[0]=1
+D=0.1
+eps=np.sqrt(2*D)
+r_k=(1/(np.sqrt(2)*np.pi))*np.exp(-1/(4*D))
+w=0.01 #(np.pi)*r_k
+phi=np.arctan(w/(2*r_k))
+A_0=0.1
+
+for j in range(N-1):
+    R=np.random.randn()
+    F[j+1]=F[j]+(F[j]-(F[j])**3)*k+A_0*np.cos(w*t[j])*k+eps*R*np.sqrt(k)
+    C[j]=np.cos(w*t[j])
+    j+=1
+
+fig, ax = plt.subplots(figsize=(10,5))
+ax.plot(t,F)
+ax.plot(t,C)
+plt.xlabel('temps', fontsize=15)
+plt.ylabel('position', fontsize=15)
+plt.axis([0,N/10,-2,2])
+plt.title(label = "Evolution de la position de la particule pour A_0 = " + str(A_0) + ", D = " + str(D) + ", Ω = " + str(w) , fontsize=15)
+plt.show()
