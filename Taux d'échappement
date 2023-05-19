@@ -1,0 +1,58 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+N=10000
+M=1000
+t=np.linspace(0,N/10,N)
+k=0.1
+
+F=np.ones((100,M,N))
+A_0=0.01
+d=np.linspace(0,1,100)
+
+r_k_=(1/(np.sqrt(2)*np.pi))*np.exp(-1/(4*d))
+w_=(np.pi)*r_k_
+eps_=np.sqrt(2*d)
+
+n=np.zeros((100,M)) #nombre de switch
+for m in range(100):
+    for i in range(M):
+        for j in range(N-1):
+            R=np.random.randn()
+            F[m,i,j+1]=F[m,i,j]+(F[m,i,j]-(F[m,i,j])**3)*k+A_0*np.cos(w_[m]*t[j])*k+eps_[m]*R*np.sqrt(k)
+            j+=1
+        i+=1
+    m+=1
+
+print('simulation fini')
+state = 0 # state = 0 qd F autour de 1 , state = 1 qd F autour de -1
+
+for w in range(100):
+    for k in range(M):
+        for l in range(N):
+            if F[w,k,l]>1 and state==1 :
+                state = 0
+                n[w,k]+=1
+            elif F[w,k,l]<-1 and state==0 :
+                state = 1
+                n[w,k]+=1
+            l+=1
+        k+=1
+    w+=1
+
+print('calcul switch fini')
+
+mean_n=np.zeros(100)
+for p in range(100):
+    mean_n[p]=sum(n[p])/(np.size(n[p]))
+    p+=1
+
+print(mean_n)
+
+fig, ax = plt.subplots(figsize=(10,5))
+ax.plot(d,r_k_,label='valeur théorique')
+ax.plot(d,mean_n/1000, label='valeur expérimentale')
+plt.xlabel('D',fontsize=15)
+plt.ylabel('kramer rate',fontsize=15)
+plt.title(label="Evolution du taux d'échappement/kramer's rate en fonction du bruit avec A_0 = " +str(A_0), fontsize=15)
+plt.show()
