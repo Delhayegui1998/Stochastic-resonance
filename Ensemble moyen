@@ -1,0 +1,46 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+M=1000
+N=50000
+length=int(N/10)
+# print(length)
+t=np.linspace(0,N/10,N) #timescale
+K=0.1
+F=np.zeros((M,N))
+C=np.zeros((M,N))
+D=0.09
+eps=np.sqrt(2*D)
+r_k=(1/(np.sqrt(2)*np.pi))*np.exp(-1/(4*D))
+w=np.pi*r_k
+phi=np.arctan(w/(2*r_k))
+A_0=0.01
+x_=np.zeros(N)
+
+# print(np.pi*r_k)
+
+for k in range(M):
+    for j in range(N-1):
+        R=np.random.randn()
+        F[k,j+1]=F[k,j]+(F[k,j]-(F[k,j])**3)*K+A_0*np.cos(w*t[j])*K+eps*R*np.sqrt(K)
+        C[k,j]=np.cos(w*t[j])
+        j+=1
+    x_=x_+F[k]
+    k+=1
+
+signal=x_/M
+
+x=(A_0/D)*1*((2*r_k)/(np.sqrt( 4*(r_k**2) + w**2 )))
+print(x)
+phi=np.arctan(w/(2*r_k))
+print(phi)
+Ampl=x*np.cos(w*t-phi)
+
+fig, ax = plt.subplots(figsize=(10,5))
+ax.plot(t,signal, label='simulation expérimentale')
+ax.plot(t,Ampl,label='courbe théorique')
+plt.xlabel('temps', fontsize=15)
+plt.ylabel('position', fontsize=15)
+plt.title(label = "Ensemble moyen avec A_0=" + str(A_0) + ", D=" + str(D) + " Ω=" + str(w), fontsize=15)
+plt.legend(loc = 'upper right')
+plt.show()
