@@ -1,0 +1,48 @@
+import numpy as np
+import matplotlib.pyplot as plt
+M=1000
+N=50000
+length=int(N/10)
+print(length)
+t=np.linspace(0,N/10,N) #timescale
+K=0.1
+F=np.zeros((M,N))
+C=np.zeros((M,N))
+A_0=0.01
+x_=np.zeros(N)
+L=11
+d=np.linspace(0,1,L)
+eps=np.sqrt(2*d)
+r_k=(1/(np.sqrt(2)*np.pi))*np.exp(-1/(4*d))
+w=0.05 #(np.pi)*r_k
+phi=np.arctan(w/(2*r_k))
+ampl=np.zeros(L)
+sd=np.zeros(L)
+
+for l in range(L):
+    x_=x_*0
+    for k in range(M):
+        for j in range(N-1):
+            R=np.random.randn()
+            F[k,j+1]=F[k,j]+(F[k,j]-(F[k,j])**3)*K+A_0*np.cos(w*t[j])*K+eps[l]*R*np.sqrt(K)
+            # C[k,j]=np.cos(w*t[j])
+            j+=1
+        x_=x_+F[k]
+        k+=1
+    x_=x_/M
+    sd[l]=np.std(x_)/(np.sqrt(M))
+    signal=x_
+    fft = np.fft.fft(signal)
+    amplitude =2*np.abs(fft[40]) / len(signal)
+    ampl[l]=amplitude
+    l+=1
+x=(A_0/d)*1*((2*r_k)/(np.sqrt( 4*(r_k**2) + w**2 )))
+
+fig, ax = plt.subplots(figsize=(10,5))
+ax.errorbar(d, ampl, yerr=sd, ecolor='red', elinewidth = 0.75, label="expérimentale")
+ax.plot(d,x,label="théorique")
+plt.xlabel('D', fontsize=15)
+plt.ylabel('Amplitude', fontsize=15)
+plt.title(label = "Amplitude en fonction de D avec A_0 = " + str(A_0) + ", W = " + str(w) , fontsize=15)
+plt.legend(loc = 'upper right')
+plt.show()
